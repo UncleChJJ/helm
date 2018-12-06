@@ -1,0 +1,27 @@
+# Default values for flume-gather.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+appname: flumegather-helm
+namespace: chenj
+image:
+  repository: depot.uhome.haier.net/base/flume1.7.0
+  tag: "1.0"
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+
+env:
+  ROOTPASSWORD: 123456
+  CLOUDUSERPASSWORD: 123456
+  LOGS_PATH: /apps
+  SERVER_PORT: 4444
+  KEY_PWD: 123456
+  TOPIC: base_logs
+  KAFKA_END_PORT: liw-kafka-0.liw-kafka-cluster.liw.svc.cluster.local:9092,liw-kafka-1.liw-kafka-cluster.liw.svc.cluster.local:9092,liw-kafka-2.liw-kafka-cluster.liw.svc.cluster.local:9092
+  NAME: liw
+resources: {}
+nodeSelector: {}

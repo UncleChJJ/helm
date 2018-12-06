@@ -1,0 +1,28 @@
+# Default values for tomcat.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 3
+appname: msgplateform-helm2
+namespace: chenj
+image:
+#  repository: depot.uhome.haier.net/paas/dubbo/service/msgplatform
+  repository: depot.uhome.haier.net/test/msg
+#  tag: "0.0.1"
+  tag: "0.1"
+  pullPolicy: Always
+
+env:
+  ROOTPASSWORD: 123456
+  CLOUDUSERPASSWORD: 123456
+
+service:
+  type: NodePort
+  port: 30003
+pv:
+  monitors: 10.159.175.16:6789,10.159.175.20:6789,10.159.175.21:6789
+  user: admin
+  secretRefname: cephfs-secret
+pvc:
+  storage: 2Gi
+

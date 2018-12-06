@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "zookeeper.appname" . }}-zk-cluster
+  namespace: {{ template "zookeeper.namespace" . }}
+  labels:
+    app: {{ template "zookeeper.appname" . }}-zk
+    ns: {{ template "zookeeper.namespace" . }}
+    sname: {{ template "zookeeper.appname" . }}
+spec:
+  ports:
+  - port: {{ .Values.ports.serverport }}
+    name: serverport
+  - port: {{ .Values.ports.leaderport }}
+    name: leaderport
+  clusterIP: None
+  selector:
+    app: {{ template "zookeeper.appname" . }}-zk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "zookeeper.appname" . }}-zk-service
+  namespace: {{ template "zookeeper.namespace" . }}
+  labels:
+    app: {{ template "zookeeper.appname" . }}-zk
+    ns: {{ template "zookeeper.namespace" . }}
+    sname: {{ template "zookeeper.appname" . }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.ports.clientport }}
+    name: clientport
+  - port: {{ .Values.ports.sshport }}
+    name: sshport
+  selector:
+    app: {{ template "zookeeper.appname" . }}-zk

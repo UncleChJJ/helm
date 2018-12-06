@@ -1,0 +1,50 @@
+# Default values for zookeeper.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+appname: testceph3
+namespace: chenj
+replicacount: 3
+
+image:
+  repository: depot.uhome.haier.net/base/zookeeper3.4.10
+  tag: "1.1"
+  pullPolicy: Always
+
+service:
+  type: NodePort
+ports:  
+  sshport: 22
+  clientport: 2181
+  serverport: 2888
+  leaderport: 3888
+
+env: 
+  ROOTPASSWORD: 123456
+  CLOUDUSERPASSWORD: 123456
+
+storageclass:
+  monitors: 10.159.175.16:6789,10.159.175.20:6789,10.159.175.21:6789
+  pool: paas
+  adminId: admin
+  adminSecretNamespace: chenj
+  adminSecretName: chenj-secret
+  userId: admin
+  #userSecretNamespace: kube-system 
+  userSecretName: chenj-secret
+  imageFormat: "2"
+  imageFeatures: layering
+pvc:
+  storage: 2Gi
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+

@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "msgplatform.appname" . }}
+  namespace: {{ template "msgplatform.namespace" . }}
+data:
+  nodeip: "10.159.47.240"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "msgplatform.appname" . }}
+  namespace: {{ template "msgplatform.namespace" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "msgplatform.appname" . }}
+    spec: 
+      hostname: {{ template "msgplatform.appname" . }}
+      containers:
+      - name: {{ template "msgplatform.appname" . }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        env:
+        - name: "SERVICE_ADDR"
+          valueFrom:
+            configMapKeyRef:
+              name: {{ template "msgplatform.appname" . }}
+              key: nodeip
+        - name: "dubbo.protocol.dubbo.port"
+          value: "{{ .Values.service.port }}"
+        volumeMounts:
+        - name: {{ template "msgplatform.appname" . }}
+          mountPath: /var/logs/paas
+        #- name: {{ template "msgplatform.appname" . }}
+        #  mountPath: /usr/share/dubbo/conf
+      volumes:
+        - name: {{ template "msgplatform.appname" . }}
+          persistentVolumeClaim:
+            claimName: {{ template "msgplatform.appname" . }}

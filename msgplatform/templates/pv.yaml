@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ template "msgplatform.appname" . }}
+  labels:
+   type: {{ template "msgplatform.appname" . }}
+  namespace: {{ template "msgplatform.namespace" . }}
+spec:
+  capacity:
+    storage: {{ default "3Gi" .Values.pvc.storage | trunc 63 | trimSuffix "-" }}
+  accessModes:
+    - ReadWriteMany
+  cephfs:
+    monitors:
+      - {{ .Values.pv.monitors }}
+    path: /msg/
+    user: {{ .Values.pv.user }}
+    secretRef:
+      name: {{ .Values.pv.secretRefname }}
+    readOnly: false
+  persistentVolumeReclaimPolicy: Recycle

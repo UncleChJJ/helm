@@ -1,0 +1,56 @@
+#author chenjianjian
+apiVersion: v1  
+kind: ReplicationController  
+metadata:  
+ name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+ namespace: {{ template "tomcat.namespace" . }}
+ labels:  
+   name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+spec:  
+ replicas: {{ .Values.replicaCount }}
+ selector:  
+   name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+ template:  
+   metadata:  
+     name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+     labels: 
+       ns: {{ template "tomcat.namespace" . }} 
+       name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+   spec:  
+     containers:
+     - name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+       image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+       imagePullPolicy: {{ .Values.image.pullPolicy }}
+       ports:
+       - containerPort: 8080
+       - containerPort: 22
+       #livenessProbe:
+       #  httpGet:
+       #    path: /
+       #    port: 8080
+       #    httpHeaders:
+       #    - name: X-Custom-Header
+       #      value: Awesome
+       #  initialDelaySeconds: 3
+       #  periodSeconds: 3
+       #readinessProbe:
+       #  httpGet:
+       #    path: /
+       #    port: 8080
+       #    httpHeaders:
+       #    - name: X-Custom-Header
+       #      value: Awesome
+       #  initialDelaySeconds: 3
+       #  periodSeconds: 3
+       env:
+       {{- range $key, $val := .Values.env }}
+       - name: {{ $key }}
+         value: {{ $val | quote }}
+       {{- end }}
+       volumeMounts:
+       - name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+         mountPath: /apps/apache-tomcat-7.0.54/logs
+     volumes:
+       - name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+         persistentVolumeClaim:
+           claimName: {{ .Release.Name }}-{{ template "tomcat.appname" . }}

@@ -1,0 +1,59 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "zookeeper.appname" . }}-zk
+  namespace: {{ template "zookeeper.namespace" . }}
+spec:
+  serviceName: {{ template "zookeeper.appname" . }}-zk-cluster
+  replicas: {{ .Values.replicacount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "zookeeper.appname" . }}-zk
+        ns: {{ template "zookeeper.namespace" . }}
+        sname: {{ template "zookeeper.appname" . }}
+    spec:
+      terminationGracePeriodSeconds: 2
+      containers:
+        - name: {{ template "zookeeper.appname" . }}-zk
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+          {{- range $key, $val := .Values.ports }}
+          - containerPort: !!int {{ $val | quote }}
+            name: {{ $key }}
+          {{- end }}
+          readinessProbe:
+            tcpSocket:
+              port: 2181
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 2181
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          env:
+          {{- range $key, $val := .Values.env }}
+          - name: {{ $key }}
+            value: {{ $val | quote }}
+          {{- end }}
+          - name: ZOO_MYID
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: ZOO_SERVER
+            value: "server.0={{ template "zookeeper.appname" . }}-zk-0.{{ template "zookeeper.appname" . }}-zk-cluster.{{ template "zookeeper.namespace" . }}.svc.cluster.local:{{ .Values.ports.serverport }}:{{ .Values.ports.leaderport }},server.1={{ template "zookeeper.appname" . }}-zk-1.{{ template "zookeeper.appname" . }}-zk-cluster.{{ template "zookeeper.namespace" . }}.svc.cluster.local:{{ .Values.ports.serverport }}:{{ .Values.ports.leaderport }},server.2={{ template "zookeeper.appname" . }}-zk-2.{{ template "zookeeper.appname" . }}-zk-cluster.{{ template "zookeeper.namespace" . }}.svc.cluster.local:{{ .Values.ports.serverport }}:{{ .Values.ports.leaderport }}"
+          volumeMounts:
+           - name: {{ template "zookeeper.appname" . }}
+             mountPath: /home/tools/zookeeper-3.4.10/log
+             mountPath: /home/clouduser
+  volumeClaimTemplates:
+  - metadata:
+     name: {{ template "zookeeper.appname" . }}
+    spec:
+     accessModes: [ "ReadWriteOnce" ]
+     storageClassName: {{ template "zookeeper.appname" . }}
+     resources:
+       requests:
+         storage: {{ default "3Gi" .Values.pvc.storage | trunc 63 | trimSuffix "-" }}

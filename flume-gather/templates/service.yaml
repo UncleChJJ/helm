@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: liw-flume-gather-service
+  namespace: liw
+  labels:
+    name: liw-flume-gather
+    ns: liw
+    sname: liw
+spec:
+  type: NodePort
+  ports:
+  - port: 22
+    name: ssh
+  - port: 4444
+    name: server
+  - port: 8080
+    name: web
+  selector:
+    name: liw-flume-gather

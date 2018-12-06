@@ -1,0 +1,10 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ template "zookeeper.appname" . }}
+  namespace: {{ template "zookeeper.namespace" . }}
+provisioner: kubernetes.io/rbd
+parameters:
+  {{- range $key, $val := .Values.storageclass }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}

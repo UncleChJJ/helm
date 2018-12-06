@@ -1,0 +1,69 @@
+# Default values for tomcat.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+appname: tomcat-helm5
+namespace: chenj
+image:
+  repository: depot.uhome.haier.net/base/tomcat7.0
+  tag: "1.0"
+  pullPolicy: Always
+
+env:
+  ROOTPASSWORD: 123456
+  CLOUDUSERPASSWORD: 123456
+  XMS: 128m
+  XMX: 256m
+  PERMSIZE: 56m
+
+storageclass:
+  monitors: 10.159.175.16:6789,10.159.175.20:6789,10.159.175.21:6789
+  pool: paas
+  adminId: admin
+  adminSecretNamespace: chenj
+  adminSecretName: chenj-secret
+  userId: admin
+  #userSecretNamespace: kube-system 
+  userSecretName: chenj-secret
+  imageFormat: "2"
+  imageFeatures: layering
+
+pvc:
+  storage: 2Gi
+
+service:
+  type: NodePort
+  sshport: 22
+  tomcatport: 8080
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

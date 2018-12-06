@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+ name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+ namespace: {{ template "tomcat.namespace" . }}
+ labels:
+   name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
+   ns: {{ template "tomcat.namespace" . }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - name: ssh
+    port: {{ .Values.service.sshport }}
+  - name: tomcat
+    port: {{ .Values.service.tomcatport }}
+  selector:
+    name: {{ .Release.Name }}-{{ template "tomcat.appname" . }}
